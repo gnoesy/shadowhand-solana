@@ -68,6 +68,7 @@ Arcium becomes the confidential execution layer for gameplay.
 
 Execution → private (hidden hands + moves)  
 Settlement → public (final outcomes + required reveals)
+![ShadowHand Architecture](architecture-shadowhand.png)
 
 ---
 
@@ -82,7 +83,7 @@ Encrypted game state updates
 Only required reveals are posted  
 ↓  
 Round outcome settled on Solana
-
+![ShadowHand UI](shadowhand-ui.png)
 ---
 
 ## Disclaimer
