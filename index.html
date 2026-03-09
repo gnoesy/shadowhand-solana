@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShadowHand Demo</title>
+  <style>
+    :root {
+      --bg: #f2ecff;
+      --panel: #ffffff;
+      --panel-2: #f8f5ff;
+      --text: #2a2340;
+      --muted: #6f6591;
+      --accent: #7c5cff;
+      --accent-2: #a893ff;
+      --line: #ddd3ff;
+      --good: #1e9e64;
+      --bad: #d14c6e;
+      --shadow: 0 18px 50px rgba(94, 73, 180, 0.12);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #ffffff 0%, rgba(255,255,255,0.4) 18%, transparent 40%),
+        linear-gradient(180deg, #f6f2ff 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(124,92,255,0.12), rgba(255,255,255,0.9));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .badge {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    h1 {
+      margin: 4px 0 0;
+      font-size: 40px;
+      line-height: 1.05;
+    }
+
+    .sub {
+      color: var(--muted);
+      max-width: 780px;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1.25fr 0.95fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .small-label {
+      display: block;
+      margin: 18px 0 8px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .hand {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card-btn, .hidden-card, .revealed-card {
+      width: 92px;
+      height: 130px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff, #f8f5ff);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      color: var(--text);
+      transition: 0.2s ease;
+      box-shadow: 0 10px 24px rgba(124, 92, 255, 0.08);
+    }
+
+    .card-btn {
+      cursor: pointer;
+    }
+
+    .card-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-2);
+    }
+
+    .card-btn.selected {
+      border-color: var(--accent);
+      outline: 3px solid rgba(124, 92, 255, 0.14);
+      transform: translateY(-2px);
+    }
+
+    .value {
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .suit {
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .hidden-card {
+      background: linear-gradient(180deg, #7c5cff, #a893ff);
+      color: white;
+    }
+
+    .hidden-card .suit {
+      color: rgba(255,255,255,0.8);
+    }
+
+    .status-box {
+      background: var(--panel-2);
+      border: 1px dashed var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(124, 92, 255, 0.12);
+    }
+
+    .big-status {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 6px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button.primary, button.secondary {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 12px 28px rgba(124, 92, 255, 0.24);
+    }
+
+    button.primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .step {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      min-width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(124, 92, 255, 0.1);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .result {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 18px;
+      background: white;
+      border: 1px solid var(--line);
+    }
+
+    .result.win { border-color: rgba(30, 158, 100, 0.25); background: rgba(30, 158, 100, 0.06); }
+    .result.lose { border-color: rgba(209, 76, 110, 0.25); background: rgba(209, 76, 110, 0.06); }
+    .result.tie { border-color: rgba(124, 92, 255, 0.25); background: rgba(124, 92, 255, 0.06); }
+
+    .result h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .footer-note {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1050px) {
+      .grid { grid-template-columns: 1fr; }
+      h1 { font-size: 34px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="badge">ShadowHand Demo · Hidden-state onchain gameplay</div>
+      <h1>Play a private card round without revealing your hand.</h1>
+      <div class="sub">
+        This demo shows the core idea behind ShadowHand: your hand stays hidden, your move is processed privately,
+        and only the rule-required reveal appears at the end. It is a simple front-end prototype for demonstrating
+        confidential game execution with Arcium MXE.
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Your Hand</h2>
+        <div class="muted">Choose one card to play. Your remaining hand stays hidden from the public game state.</div>
+        <span class="small-label">Select your move</span>
+        <div id="playerHand" class="hand"></div>
+        <div class="actions">
+          <button id="playBtn" class="primary" disabled>Play encrypted move</button>
+          <button id="resetBtn" class="secondary">Reset round</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Private Execution</h2>
+        <div class="muted">The selected move is not revealed immediately. Instead, the game logic runs privately, then only the necessary result is shown.</div>
+
+        <div class="status-box">
+          <div class="status-pill"><span class="dot"></span> Arcium MXE Simulation</div>
+          <p id="statusTitle" class="big-status">Waiting for your encrypted move.</p>
+          <div id="statusText" class="muted">No public game information is leaked until the round resolves.</div>
+        </div>
+
+        <span class="small-label">How this demo works</span>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div><strong>Select a card.</strong><div class="muted">This is your hidden move.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div><strong>Process privately.</strong><div class="muted">Game logic runs as if handled inside encrypted compute.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div><strong>Reveal only what is required.</strong><div class="muted">Played cards and round outcome become visible.</div></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Round Reveal</h2>
+        <div class="muted">Only the played cards and the round result are revealed.</div>
+        <span class="small-label">Public reveal</span>
+        <div class="hand" style="justify-content:space-between; gap: 14px;">
+          <div>
+            <div class="muted" style="margin-bottom:8px; font-weight:700;">Your played card</div>
+            <div id="playerReveal" class="hidden-card"><div class="value">?</div><div class="suit">Hidden</div></div>
+          </div>
+          <div>
+            <div class="muted" style="margin-bottom:8px; font-weight:700;">Opponent reveal</div>
+            <div id="opponentReveal" class="hidden-card"><div class="value">?</div><div class="suit">Hidden</div></div>
+          </div>
+        </div>
+        <div id="resultBox" class="result tie" style="display:none;">
+          <h3 id="resultTitle">Round result</h3>
+          <div id="resultText" class="muted"></div>
+        </div>
+        <div class="legend">
+          <span>Hidden hands</span>
+          <span>Encrypted move</span>
+          <span>Minimal reveal</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">
+      This is a simple prototype for public demonstration. In a full implementation, private move validation,
+      hidden-state transitions, and outcome computation would run inside Arcium MXE while Solana records only
+      the rule-required reveals and final settlement.
+    </div>
+  </div>
+
+  <script>
+    const suits = ["♠", "♥", "♦", "♣"];
+    const values = [2, 4, 6, 8, 10, 12, 14];
+
+    let playerCards = [];
+    let opponentCards = [];
+    let selectedIndex = null;
+
+    const playerHandEl = document.getElementById('playerHand');
+    const playBtn = document.getElementById('playBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const statusTitle = document.getElementById('statusTitle');
+    const statusText = document.getElementById('statusText');
+    const playerReveal = document.getElementById('playerReveal');
+    const opponentReveal = document.getElementById('opponentReveal');
+    const resultBox = document.getElementById('resultBox');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultText = document.getElementById('resultText');
+
+    function randomCard() {
+      return {
+        value: values[Math.floor(Math.random() * values.length)],
+        suit: suits[Math.floor(Math.random() * suits.length)]
+      };
+    }
+
+    function setupRound() {
+      selectedIndex = null;
+      playerCards = [randomCard(), randomCard(), randomCard()];
+      opponentCards = [randomCard(), randomCard(), randomCard()];
+      playerHandEl.innerHTML = '';
+      playerCards.forEach((card, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'card-btn';
+        btn.innerHTML = `<div class="value">${card.value}</div><div class="suit">${card.suit}</div>`;
+        btn.addEventListener('click', () => {
+          selectedIndex = idx;
+          [...playerHandEl.children].forEach(el => el.classList.remove('selected'));
+          btn.classList.add('selected');
+          playBtn.disabled = false;
+          statusTitle.textContent = 'Encrypted move ready.';
+          statusText.textContent = 'Your selected card is chosen locally. It has not been publicly revealed.';
+        });
+        playerHandEl.appendChild(btn);
+      });
+
+      playerReveal.innerHTML = `<div class="value">?</div><div class="suit">Hidden</div>`;
+      opponentReveal.innerHTML = `<div class="value">?</div><div class="suit">Hidden</div>`;
+      playerReveal.className = 'hidden-card';
+      opponentReveal.className = 'hidden-card';
+      resultBox.style.display = 'none';
+      resultBox.className = 'result tie';
+      playBtn.disabled = true;
+      statusTitle.textContent = 'Waiting for your encrypted move.';
+      statusText.textContent = 'No public game information is leaked until the round resolves.';
+    }
+
+    function revealCard(el, card) {
+      el.className = 'revealed-card';
+      el.innerHTML = `<div class="value">${card.value}</div><div class="suit">${card.suit}</div>`;
+    }
+
+    function processMove() {
+      if (selectedIndex === null) return;
+      playBtn.disabled = true;
+      statusTitle.textContent = 'Processing inside Arcium MXE...';
+      statusText.textContent = 'Validating rules, comparing played cards, and updating hidden state privately.';
+
+      setTimeout(() => {
+        const playerCard = playerCards[selectedIndex];
+        const opponentCard = opponentCards[Math.floor(Math.random() * opponentCards.length)];
+
+        revealCard(playerReveal, playerCard);
+        revealCard(opponentReveal, opponentCard);
+
+        let state = 'tie';
+        let title = 'Round tied';
+        let copy = 'Both played cards resolved to the same value. Only the played cards and outcome were revealed.';
+
+        if (playerCard.value > opponentCard.value) {
+          state = 'win';
+          title = 'You win the round';
+          copy = 'Your played card outranked the opponent. Hidden cards remain private.';
+        } else if (playerCard.value < opponentCard.value) {
+          state = 'lose';
+          title = 'You lose the round';
+          copy = 'The opponent card outranked yours. Only the minimum reveal was published.';
+        }
+
+        resultBox.style.display = 'block';
+        resultBox.className = `result ${state}`;
+        resultTitle.textContent = title;
+        resultText.textContent = copy;
+
+        statusTitle.textContent = 'Round resolved with minimal reveal.';
+        statusText.textContent = 'The system revealed only what the game required: the played cards and round outcome.';
+      }, 1400);
+    }
+
+    playBtn.addEventListener('click', processMove);
+    resetBtn.addEventListener('click', setupRound);
+
+    setupRound();
+  </script>
+</body>
+</html>
